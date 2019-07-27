@@ -1,9 +1,14 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using AutoMapper;
+using IdentityServer.Managers;
+using IdentityServer.Models;
+using IdentityServer.Quickstart.Role;
+using IdentityServer.Quickstart.User;
 using IdentityServerAspNetIdentity.Data;
-using IdentityServerAspNetIdentity.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -34,7 +39,9 @@ namespace IdentityServerAspNetIdentity
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<TimekeepingUser, IdentityRole>()
+                .AddRoleManager<TimekeepingRoleManager>()
+                .AddUserManager<TimekeepingUserManager>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -70,7 +77,7 @@ namespace IdentityServerAspNetIdentity
                     // this enables automatic token cleanup. this is optional.
                     options.EnableTokenCleanup = true;
                 })
-                .AddAspNetIdentity<ApplicationUser>();
+                .AddAspNetIdentity<TimekeepingUser>();
 
             if (Environment.IsDevelopment())
             {
@@ -106,7 +113,36 @@ namespace IdentityServerAspNetIdentity
 
             app.UseStaticFiles();
             app.UseIdentityServer();
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc(x=>
+            {
+                x.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+
+                x.MapRoute(
+                    name: "manage",
+                    template: "Manage/{controller=User}/{action=Index}/{id?}");
+            });
+
+            Mapper.Initialize(c=>
+            {
+                c.CreateMap<TimekeepingUser, UserViewModel>();
+                //.ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
+                //c.CreateMap<TimekeepingUser, UserInputModel>(MemberList.Source)
+                //.ForMember(dst=> dst.Id, opt=> opt.MapFrom(src=> src.Id))
+                //;
+                c.CreateMap<TimekeepingUser, UserInputModel>()
+                .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
+                c.CreateMap<UserInputModel, TimekeepingUser>()
+                .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
+
+                c.CreateMap<TimekeepingRole, RoleViewModel>();
+                //.ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
+                c.CreateMap<RoleInputModel, TimekeepingRole>();
+                //.ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
+            });
+
+            Mapper.Configuration.CompileMappings();
         }
     }
 }

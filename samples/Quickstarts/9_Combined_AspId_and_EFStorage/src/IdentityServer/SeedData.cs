@@ -7,10 +7,11 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using IdentityModel;
+using IdentityServer.Managers;
+using IdentityServer.Models;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServerAspNetIdentity.Data;
-using IdentityServerAspNetIdentity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,15 +25,60 @@ namespace IdentityServerAspNetIdentity
             provider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
             provider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
             provider.GetRequiredService<ConfigurationDbContext>().Database.Migrate();
-
             {
-                var userMgr = provider.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleMgr = provider.GetRequiredService<TimekeepingRoleManager>();
+
+                var admin = roleMgr.FindByNameAsync("Administrator").Result;
+                if (admin == null)
+                {
+                    admin = new TimekeepingRole
+                    {
+                        Name = "Administrator"
+                    };
+                    var result = roleMgr.CreateAsync(admin).Result;
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception(result.Errors.First().Description);
+                    }
+
+                    Console.WriteLine("Administrator Role Created");
+                }
+                else
+                {
+                    Console.WriteLine("Administrator Role Already Exists");
+                }
+
+                var analyst = roleMgr.FindByNameAsync("Analyst").Result;
+                if (analyst == null)
+                {
+                    analyst = new TimekeepingRole
+                    {
+                        Name = "Analyst"
+                    };
+                    var result = roleMgr.CreateAsync(analyst).Result;
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception(result.Errors.First().Description);
+                    }
+
+                    Console.WriteLine("Analyst Role Created");
+                }
+                else
+                {
+                    Console.WriteLine("Analyst Role Already Exists");
+                }
+
+            }
+            {
+                var userMgr = provider.GetRequiredService<TimekeepingUserManager>();
                 var alice = userMgr.FindByNameAsync("alice").Result;
                 if (alice == null)
                 {
-                    alice = new ApplicationUser
+                    alice = new TimekeepingUser
                     {
-                        UserName = "alice"
+                        UserName = "alice",
+                        Email = "alice@fakemail.com",
+                        PhoneNumber = "01234 567890"
                     };
                     var result = userMgr.CreateAsync(alice, "Pass123$").Result;
                     if (!result.Succeeded)
@@ -65,9 +111,11 @@ namespace IdentityServerAspNetIdentity
                 var bob = userMgr.FindByNameAsync("bob").Result;
                 if (bob == null)
                 {
-                    bob = new ApplicationUser
+                    bob = new TimekeepingUser
                     {
-                        UserName = "bob"
+                        UserName = "bob",
+                        Email = "bob@fakemail.com",
+                        PhoneNumber = "098765 43210"
                     };
                     var result = userMgr.CreateAsync(bob, "Pass123$").Result;
                     if (!result.Succeeded)

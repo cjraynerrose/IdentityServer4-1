@@ -1,0 +1,36 @@
+﻿@model IdentityServer.Quickstart.User.UserInputModel
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<form>
+    <input class="hide" asp-for="Id" hidden />
+    <div class="input-group">
+        <label asp-for="UserName"></label>
+        <input class="form-control" asp-for="UserName" />
+        <span class="text-danger" asp-validation-for="UserName"></span>
+    </div>
+    <div class="input-group">
+        <label asp-for="Email"></label>
+        <input class="form-control" asp-for="Email" />
+        <span class="text-danger" asp-validation-for="Email"></span>
+    </div>
+    <div class="input-group">
+        <label asp-for="PhoneNumber"></label>
+        <input class="form-control" asp-for="PhoneNumber" />
+        <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+    </div>
+    <div class="input-group">
+        <select asp-for="RoleName"
+                asp-items="@(new SelectList(ViewBag.roles,"Id","Name", Model.RoleName))">
+            <option>Please select one</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <input class="btn btn-primary" type="submit" value="Save" formmethod="post"/>
+    </div>
+</form>
+

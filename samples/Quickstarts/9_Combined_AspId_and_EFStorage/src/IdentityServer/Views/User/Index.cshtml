@@ -1,0 +1,52 @@
+﻿@model List<IdentityServer.Quickstart.User.UserViewModel>
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+
+</head>
+
+<h2>Users</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m[0].UserName)</th>
+            <th>@Html.DisplayNameFor(m => m[0].Email)</th>
+            <th>@Html.DisplayNameFor(m => m[0].RoleName)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.UserName</td>
+                <td>@item.Email</td>
+                <td>@item.RoleName</td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Actions
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" asp-controller="User" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <a class="dropdown-item" asp-controller="User" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" asp-controller="User" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script src="~/lib/jquery/jquery.js"></script>
+<script src="~/lib/popper.js/umd/popper-utils.js"></script>
+<script src="~/lib/popper.js/umd/popper.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
