@@ -8,7 +8,7 @@ namespace IdentityServer.Quickstart.User
 {
     public class UserInputModel
     {
-        public string Id { get; }
+        public string Id { get; set; }
         [Display(Name = "User Name")]
         public string UserName { get; set; }
         [Display(Name = "Email")]
@@ -16,6 +16,6 @@ namespace IdentityServer.Quickstart.User
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
         [Display(Name = "Role")]
-        public string RoleName { get; set; }
+        public string RoleId { get; set; }
     }
 }

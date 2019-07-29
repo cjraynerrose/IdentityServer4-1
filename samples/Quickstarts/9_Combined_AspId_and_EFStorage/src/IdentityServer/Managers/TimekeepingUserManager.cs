@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Models;
+using IdentityServer.Quickstart.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -26,5 +27,36 @@ namespace IdentityServer.Managers
         {
 
         }
+
+        public async Task<List<UserViewModel>> AddRolesToModelAsync(List<UserViewModel> models)
+        {
+            foreach (var model in models)
+            {
+                model.RoleName = await GetRoleFromUserIdAsync(model.Id);
+            }
+
+            return models;
+        }
+
+        public async Task<UserViewModel> AddRolesToModelAsync(UserViewModel model)
+        {
+            model.RoleName = await GetRoleFromUserIdAsync(model.Id);
+            return model;
+        }
+
+        public async Task<string> GetRoleFromUserIdAsync(string userId)
+        {
+            var user = await FindByIdAsync(userId);
+
+            if(user == null)
+            {
+                return string.Empty;
+            }
+
+            var roles = await GetRolesAsync(user);
+
+            return roles.FirstOrDefault();
+        }
+
     }
 }

@@ -127,19 +127,24 @@ namespace IdentityServerAspNetIdentity
             Mapper.Initialize(c=>
             {
                 c.CreateMap<TimekeepingUser, UserViewModel>();
-                //.ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
-                //c.CreateMap<TimekeepingUser, UserInputModel>(MemberList.Source)
-                //.ForMember(dst=> dst.Id, opt=> opt.MapFrom(src=> src.Id))
-                //;
                 c.CreateMap<TimekeepingUser, UserInputModel>()
-                .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
+                .ForMember(dst => dst.RoleId, opt => opt.Ignore())
+                ;
                 c.CreateMap<UserInputModel, TimekeepingUser>()
-                .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
-
+                .ForMember(dst=> dst.AccessFailedCount, opt=> opt.Ignore())
+                .ForMember(dst=> dst.ConcurrencyStamp, opt=> opt.Ignore())
+                .ForMember(dst=> dst.EmailConfirmed, opt=> opt.Ignore())
+                .ForMember(dst=> dst.LockoutEnabled, opt=> opt.Ignore())
+                .ForMember(dst=> dst.LockoutEnd, opt=> opt.Ignore())
+                .ForMember(dst=> dst.NormalizedEmail, opt=> opt.Ignore())
+                .ForMember(dst=> dst.NormalizedUserName, opt=> opt.Ignore())
+                .ForMember(dst=> dst.PasswordHash, opt=> opt.Ignore())
+                .ForMember(dst=> dst.PhoneNumberConfirmed, opt=> opt.Ignore())
+                .ForMember(dst=> dst.SecurityStamp, opt=> opt.Ignore())
+                .ForMember(dst=> dst.TwoFactorEnabled, opt=> opt.Ignore())
+                ;
                 c.CreateMap<TimekeepingRole, RoleViewModel>();
-                //.ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
                 c.CreateMap<RoleInputModel, TimekeepingRole>();
-                //.ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.Id));
             });
 
             Mapper.Configuration.CompileMappings();

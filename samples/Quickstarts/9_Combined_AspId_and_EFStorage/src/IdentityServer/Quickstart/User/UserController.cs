@@ -33,11 +33,13 @@ namespace IdentityServer.Quickstart.User
 
         [HttpGet("")]
         [HttpGet("Index")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var users = _userManager.Users.ToList();
 
             var userModels = Mapper.Map<List<UserViewModel>>(users);
+            userModels = await _userManager.AddRolesToModelAsync(userModels);
+            
 
             return View(userModels);
         }
@@ -63,7 +65,10 @@ namespace IdentityServer.Quickstart.User
         {
             var user = await _userManager.FindByIdAsync(id);
 
-            return View(user);
+            var userModel = Mapper.Map<UserViewModel>(user);
+            userModel = await _userManager.AddRolesToModelAsync(userModel);
+
+            return View(userModel);
         }
 
         [HttpGet("Edit/{id}")]
@@ -75,7 +80,7 @@ namespace IdentityServer.Quickstart.User
 
             if(!string.IsNullOrEmpty(userRole))
             {
-                userModel.RoleName = userRole;
+                userModel.RoleId = userRole;
             }
 
             var roles = _roleManager.Roles.ToList();
@@ -86,7 +91,8 @@ namespace IdentityServer.Quickstart.User
         }
 
         [HttpPost("Edit/{id}")]
-        public async Task<IActionResult> Edit(string id, UserInputModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UserInputModel model, string id)
         {
             if (id != model.Id)
             { 
@@ -98,7 +104,10 @@ namespace IdentityServer.Quickstart.User
                 return View(model);
             }
 
-            var user = Mapper.Map<TimekeepingUser>(model);
+            var updatedData = Mapper.Map<TimekeepingUser>(model);
+            var user = await _userManager.FindByIdAsync(id);
+            user.Update(updatedData);
+
             var userResult = await _userManager.UpdateAsync(user);
             if(!userResult.Succeeded)
             {
@@ -106,10 +115,12 @@ namespace IdentityServer.Quickstart.User
                 return View(model);
             }
 
-            var sameRole = await _userManager.IsInRoleAsync(user, model.RoleName);
+            var role = await _roleManager.FindByIdAsync(model.RoleId);
+
+            var sameRole = await _userManager.IsInRoleAsync(user, role.Name);
             if (sameRole)
             {
-                return View(nameof(Details), new { id });
+                return RedirectToAction(nameof(Details), new { id });
             }
 
             var userRoles = await _userManager.GetRolesAsync(user);
@@ -120,14 +131,14 @@ namespace IdentityServer.Quickstart.User
                 return View(model);
             }
 
-            var addRoleResult = await _userManager.AddToRoleAsync(user, model.RoleName);
+            var addRoleResult = await _userManager.AddToRoleAsync(user, role.Name);
             if(!addRoleResult.Succeeded)
             {
                 ModelState.AddModelError(string.Empty, addRoleResult.Errors.First().Description);
                 return View(model);
             }
 
-            return View(nameof(Details), new { id });
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         [HttpGet("Delete/{id}")]
@@ -136,6 +147,7 @@ namespace IdentityServer.Quickstart.User
             var user = await _userManager.FindByIdAsync(id);
 
             var userModel = Mapper.Map<UserViewModel>(user);
+            userModel = await _userManager.AddRolesToModelAsync(userModel);
 
             return View(userModel);
         }
@@ -165,8 +177,6 @@ namespace IdentityServer.Quickstart.User
 
             return View(nameof(Index));
         }
-
-
-
+    
     }
 }
