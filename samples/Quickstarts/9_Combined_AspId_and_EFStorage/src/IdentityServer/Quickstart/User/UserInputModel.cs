@@ -16,6 +16,6 @@ namespace IdentityServer.Quickstart.User
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
         [Display(Name = "Role")]
-        public string RoleId { get; set; }
+        public string RoleName { get; set; }
     }
 }

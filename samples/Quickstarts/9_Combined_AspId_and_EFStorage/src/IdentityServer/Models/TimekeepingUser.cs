@@ -8,8 +8,6 @@ namespace IdentityServer.Models
         public void Update(TimekeepingUser updateUser)
         {
             UserName = updateUser.UserName;
-            PhoneNumber = updateUser.PhoneNumber;
-            Email = updateUser.Email;
         }
     }
 }

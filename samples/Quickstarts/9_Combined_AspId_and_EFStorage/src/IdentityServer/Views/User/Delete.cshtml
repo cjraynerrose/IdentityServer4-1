@@ -1,7 +1,28 @@
-﻿
+﻿@model IdentityServer.Quickstart.User.UserInputModel
+
 @{
     ViewData["Title"] = "Delete";
 }
 
 <h2>Delete</h2>
 
+<dl>
+    <dt>@Html.DisplayNameFor(m => m.UserName)</dt>
+    <dd>@Html.DisplayFor(m => m.UserName)</dd>
+
+    <dt>@Html.DisplayNameFor(m => m.Email)</dt>
+    <dd>@Html.DisplayFor(m => m.Email)</dd>
+
+    <dt>@Html.DisplayNameFor(m => m.PhoneNumber)</dt>
+    <dd>@Html.DisplayFor(m => m.PhoneNumber)</dd>
+
+    <dt>@Html.DisplayNameFor(m => m.RoleName)</dt>
+    <dd>@Html.DisplayFor(m => m.RoleName)</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <div class="row">
+        <input class="btn btn-danger" type="submit" value="Delete" />
+        <a class="btn btn-info ml-1" asp-action="Index" asp-controller="User">Back to List</a>
+    </div>
+</form>

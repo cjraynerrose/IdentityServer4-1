@@ -7,10 +7,14 @@
 
 <head>
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
-
 </head>
 
-<h2>Users</h2>
+<div class="row mt-4 mb-3">
+    <h2>Users</h2>
+    <form class="ml-auto" asp-action="Create" asp-controller="User" method="get">
+        <input type="submit" class="btn btn-success" value="New User" />
+    </form>
+</div>
 
 <table class="table">
     <thead>

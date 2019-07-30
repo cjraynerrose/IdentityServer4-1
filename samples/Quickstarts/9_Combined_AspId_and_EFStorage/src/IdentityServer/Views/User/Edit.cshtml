@@ -24,17 +24,18 @@
         <span class="text-danger" asp-validation-for="PhoneNumber"></span>
     </div>
     <div class="form-group">
-        <label asp-for="RoleId"></label>
-        <select class="form-control" asp-for="RoleId"
-                asp-items="@(new SelectList(ViewBag.roles,"Name","Name", Model.RoleId))">
+        <label asp-for="RoleName"></label>
+        <select class="form-control" asp-for="RoleName"
+                asp-items="@(new SelectList(ViewBag.roles,"Name","Name", Model.RoleName))">
             <option>Please select one</option>
         </select>
-        <span class="table-danger" asp-validation-for="RoleId"></span>
+        <span class="table-danger" asp-validation-for="RoleName"></span>
     </div>
 
     <div class="form-group">
         <input class="btn btn-primary" type="submit" value="Save"
                asp-action="Edit" asp-controller="User" formmethod="post"/>
+        <a class="btn btn-info ml-1" asp-action="Index" asp-controller="User">Back to List</a>
     </div>
 </form>
 

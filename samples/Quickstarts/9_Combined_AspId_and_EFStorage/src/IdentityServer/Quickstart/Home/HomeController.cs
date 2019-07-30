@@ -30,12 +30,10 @@ namespace IdentityServer4.Quickstart.UI
         {
             if (_environment.IsDevelopment())
             {
-                // only show in development
-                return View();
+                return RedirectToAction("", "User");
             }
 
-            _logger.LogInformation("Homepage is disabled in production. Returning 404.");
-            return NotFound();
+            return RedirectToAction("Index", "User");
         }
 
         /// <summary>

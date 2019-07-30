@@ -54,6 +54,11 @@ namespace IdentityServer4.Quickstart.UI
         [HttpGet]
         public async Task<IActionResult> Login(string returnUrl)
         {
+            if(_signInManager.IsSignedIn(HttpContext.User))
+            {
+                return RedirectToAction("Index", "User");
+            }
+
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
 

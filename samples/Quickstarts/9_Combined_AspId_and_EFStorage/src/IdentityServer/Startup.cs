@@ -117,18 +117,15 @@ namespace IdentityServerAspNetIdentity
             {
                 x.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=User}/{action=Index}");
 
-                x.MapRoute(
-                    name: "manage",
-                    template: "Manage/{controller=User}/{action=Index}/{id?}");
             });
 
             Mapper.Initialize(c=>
             {
                 c.CreateMap<TimekeepingUser, UserViewModel>();
                 c.CreateMap<TimekeepingUser, UserInputModel>()
-                .ForMember(dst => dst.RoleId, opt => opt.Ignore())
+                .ForMember(dst => dst.RoleName, opt => opt.Ignore())
                 ;
                 c.CreateMap<UserInputModel, TimekeepingUser>()
                 .ForMember(dst=> dst.AccessFailedCount, opt=> opt.Ignore())

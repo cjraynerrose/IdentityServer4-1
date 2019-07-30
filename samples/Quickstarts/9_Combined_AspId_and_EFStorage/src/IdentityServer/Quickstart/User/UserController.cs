@@ -16,8 +16,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace IdentityServer.Quickstart.User
 {
     [SecurityHeaders]
+    [AutoValidateAntiforgeryToken]
     [Authorize]
-    [Route("User")]
     public class UserController : Controller
     {
         private readonly TimekeepingUserManager _userManager;
@@ -48,16 +48,34 @@ namespace IdentityServer.Quickstart.User
         public IActionResult Create()
         {
             var roles = _roleManager.Roles.ToList();
-            var roleModels = Mapper.Map<RoleViewModel>(roles);
+            var roleModels = Mapper.Map<List<RoleViewModel>>(roles);
             ViewBag.roles = roleModels;
 
             return View();
         }
 
         [HttpPost("Create")]
-        public IActionResult Create(UserInputModel model)
+        public async Task<IActionResult> Create(UserInputModel model)
         {
-            return RedirectToAction(nameof(Details), new { id = model.Id });
+            var user = Mapper.Map<TimekeepingUser>(model);
+
+            var createResult = await _userManager.CreateAsync(user);
+            if(!createResult.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, createResult.Errors.FirstOrDefault().Description);
+                return View(model);
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(user, model.RoleName);
+            if(!roleResult.Succeeded)
+            {
+                var message = $"The user was created, but an error occurred when assigning a role.\r\n" +
+                    $"{createResult.Errors.FirstOrDefault().Description}";
+                _logger.LogError(message, model);
+                ModelState.AddModelError(string.Empty, message);
+            }
+
+            return RedirectToAction(nameof(Details), new { id = user.Id });
         }
 
         [HttpGet("Details/{id}")]
@@ -80,7 +98,7 @@ namespace IdentityServer.Quickstart.User
 
             if(!string.IsNullOrEmpty(userRole))
             {
-                userModel.RoleId = userRole;
+                userModel.RoleName = userRole;
             }
 
             var roles = _roleManager.Roles.ToList();
@@ -91,7 +109,6 @@ namespace IdentityServer.Quickstart.User
         }
 
         [HttpPost("Edit/{id}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserInputModel model, string id)
         {
             if (id != model.Id)
@@ -115,7 +132,7 @@ namespace IdentityServer.Quickstart.User
                 return View(model);
             }
 
-            var role = await _roleManager.FindByIdAsync(model.RoleId);
+            var role = await _roleManager.FindByNameAsync(model.RoleName);
 
             var sameRole = await _userManager.IsInRoleAsync(user, role.Name);
             if (sameRole)
@@ -145,9 +162,13 @@ namespace IdentityServer.Quickstart.User
         public async Task<IActionResult> Delete(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            var userModel = Mapper.Map<UserInputModel>(user);
+            var userRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
-            var userModel = Mapper.Map<UserViewModel>(user);
-            userModel = await _userManager.AddRolesToModelAsync(userModel);
+            if (!string.IsNullOrEmpty(userRole))
+            {
+                userModel.RoleName = userRole;
+            }
 
             return View(userModel);
         }
@@ -175,7 +196,7 @@ namespace IdentityServer.Quickstart.User
                 return View(model);
             }
 
-            return View(nameof(Index));
+            return RedirectToAction(nameof(Index));
         }
     
     }

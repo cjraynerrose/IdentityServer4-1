@@ -18,3 +18,11 @@
     <dt>@Html.DisplayNameFor(m => m.RoleName)</dt>
     <dd>@Html.DisplayFor(m => m.RoleName)</dd>
 </dl>
+
+<form asp-action="Edit" asp-controller="User" method="get">
+    <input asp-for="Id" hidden />
+    <div class="row">
+        <input class="btn btn-primary" type="submit" value="Edit"/>
+        <a class="btn btn-info ml-1" asp-action="Index" asp-controller="User">Back to List</a>
+    </div>
+</form>
