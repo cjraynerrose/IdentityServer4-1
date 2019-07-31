@@ -17,7 +17,7 @@ namespace IdentityServer.Quickstart.User
 {
     [SecurityHeaders]
     [AutoValidateAntiforgeryToken]
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     public class UserController : Controller
     {
         private readonly TimekeepingUserManager _userManager;

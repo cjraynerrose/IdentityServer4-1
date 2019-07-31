@@ -7,12 +7,11 @@
       "destination": "wwwroot/lib/bootstrap/"
     },
     {
-      "library": "jquery@3.4.1",
+      "library": "jquery@3.3.1",
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "provider": "unpkg",
-      "library": "popper.js@1.15.0",
+      "library": "popper.js@1.14.7",
       "destination": "wwwroot/lib/popper.js/"
     },
     {
