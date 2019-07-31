@@ -1,6 +1,5 @@
 ﻿@model List<IdentityServer.Quickstart.User.UserViewModel>
 
-
 @{
     ViewData["Title"] = "Index";
 }
@@ -20,7 +19,6 @@
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(m => m[0].UserName)</th>
-            <th>@Html.DisplayNameFor(m => m[0].Email)</th>
             <th>@Html.DisplayNameFor(m => m[0].RoleName)</th>
             <th>Actions</th>
         </tr>
@@ -30,7 +28,6 @@
         {
             <tr>
                 <td>@item.UserName</td>
-                <td>@item.Email</td>
                 <td>@item.RoleName</td>
                 <td>
                     <div class="dropdown">
