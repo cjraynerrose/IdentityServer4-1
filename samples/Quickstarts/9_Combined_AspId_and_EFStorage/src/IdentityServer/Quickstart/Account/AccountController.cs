@@ -5,6 +5,7 @@
 using IdentityModel;
 using IdentityServer.Managers;
 using IdentityServer.Models;
+using IdentityServer.Quickstart.User;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
@@ -333,6 +334,60 @@ namespace IdentityServer4.Quickstart.UI
             }
 
             return vm;
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult CreatePassword(string userId, string code = null)
+        {
+            if (code == null)
+            {
+                throw new ApplicationException("A code must be supplied for password creation.");
+            }
+            var model = new ResetPasswordViewModel { Code = code };
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreatePassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return RedirectToAction(nameof(CreateNewPasswordConfirmation));
+            }
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            if (result.Succeeded)
+            {
+                // If a user has successfully created a password their email has been confirmed.
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+                return View(nameof(CreateNewPasswordConfirmation));
+            }
+            AddErrors(result);
+            return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult CreateNewPasswordConfirmation()
+        {
+            return View();
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
         }
     }
 }

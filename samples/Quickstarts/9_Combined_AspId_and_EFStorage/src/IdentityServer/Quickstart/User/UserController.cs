@@ -7,11 +7,10 @@ using IdentityServer.Managers;
 using IdentityServer.Quickstart.Role;
 using IdentityServer4.Quickstart.UI;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using IdentityServer.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 
 namespace IdentityServer.Quickstart.User
 {
@@ -198,6 +197,40 @@ namespace IdentityServer.Quickstart.User
 
             return RedirectToAction(nameof(Index));
         }
-    
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> CreateNewPassword(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if(user == null)
+            {
+                return BadRequest();
+            }
+
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callbackUrl = Url.CreatePasswordCallbackLink(code, "https");
+
+            var model = new CreatePasswordModel
+            {
+                Name = user.UserName,
+                CallbackUrl = callbackUrl
+            };
+
+            return View(model);
+        }
+
+
+        
+
+        
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
     }
 }
