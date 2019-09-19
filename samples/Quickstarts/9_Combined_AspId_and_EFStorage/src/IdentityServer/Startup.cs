@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace IdentityServerAspNetIdentity
 {
@@ -79,24 +80,23 @@ namespace IdentityServerAspNetIdentity
                 })
                 .AddAspNetIdentity<TimekeepingUser>();
 
-            if (Environment.IsDevelopment())
-            {
-                builder.AddDeveloperSigningCredential();
-            }
-            else
-            {
-                throw new Exception("need to configure key material");
-            }
+            //if (Environment.IsDevelopment())
+            //{
+            //    builder.AddDeveloperSigningCredential();
+            //}
+            //else
+            //{
+            //var tp = "dc84655d78ce21b4d5e90f3135efef9771ba6599";//pmbl.com
+            var tp = "071dd553f82ce9dc57a1e2df43d049041fd40d25"; // dev.crit
+                var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                store.Open(OpenFlags.ReadOnly);
+                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, tp, false);
+                store.Close();
 
-            services.AddAuthentication()
-                .AddGoogle(options =>
-                {
-                    // register your IdentityServer with Google at https://console.developers.google.com
-                    // enable the Google+ API
-                    // set the redirect URI to http://localhost:5000/signin-google
-                    options.ClientId = "copy client ID from Google here";
-                    options.ClientSecret = "copy client secret from Google here";
-                });
+                builder.AddSigningCredential(certs[0]);
+            //}
+
+            services.AddAuthentication();
         }
 
         public void Configure(IApplicationBuilder app)
